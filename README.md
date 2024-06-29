@@ -1,2 +1,2 @@
-# MysteryMaze
-Submission for Game-A-Thon: Heighers X GMonks
+# Mystery Maze
+Submission for Game-A-Thon: Heighers X GMonks.
