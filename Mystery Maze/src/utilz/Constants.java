@@ -3,12 +3,12 @@ package utilz;
 public class Constants {
 	
 	public static class GameConsts {
-		public static final int FPS_SET = 120;
-		public static final int UPS_SET =  60;
+		public static final int FPS_SET = 60; // Minimum: 10 FPS
+		public static final int UPS_SET = 60; // Minimum: 30 UPS
 	}
 	
 	public static class SizeConsts {
-		public static final float SCALE = 1.25f;
+		public static final float SCALE = 1.0f; // SCALE * moveSpeed must result in a whole number
 		public static final int TILES_DEFAULT_SIZE = 32;
 		public static final int TILES_IN_WIDTH  = 27; // Must be odd
 		public static final int TILES_IN_HEIGHT = 15; // Must be odd
@@ -25,8 +25,11 @@ public class Constants {
 		public static final int DOOR = 3;
 		public static final int KEY = 4;
 		public static final int TREASURE = 5;
+		public static final int COIN = 6;		
+		public static final int PLAYER = 7;
+		public static final int ENEMY = 8;
 		
-		public static final float SPIKE_PROBABILITY = 0.02f;
+		public static final int NO_OF_SPIKES = 6;
 	}
 
 }

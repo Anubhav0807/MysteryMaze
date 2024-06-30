@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
+import entities.Player;
+
 public class MazeGenerator {
 	
 	private int[][] maze;
@@ -16,8 +18,13 @@ public class MazeGenerator {
 	private Vector2 doorPos;
 	private Vector2 keyPos;
 	private Vector2 treasurePos;
+	private Vector2 playerPos;
 	
-	public MazeGenerator() {
+	private Player player;
+	
+	public MazeGenerator(Player player) {
+		this.player = player;
+		
 		maze = new int[TILES_IN_WIDTH][TILES_IN_HEIGHT];
 		oddRow = new int[TILES_IN_WIDTH  / 2];
 		oddCol = new int[TILES_IN_HEIGHT / 2];
@@ -29,6 +36,8 @@ public class MazeGenerator {
 		for (int i=0, j=1; j<TILES_IN_HEIGHT; i++, j+=2) {
 			oddCol[i] = j;
 		}
+		
+		generateMaze();
 	}
 	
 	public void generateMaze() {
@@ -50,10 +59,12 @@ public class MazeGenerator {
 		generateSpikes();
 		generateKey();
 		generateTreasure();
+		generatePlayer();
 		
 		set(doorPos, DOOR);
 		set(keyPos, KEY);
 		set(treasurePos, TREASURE);
+		player.setPosition(playerPos.x * TILE_SIZE, playerPos.y * TILE_SIZE);
 	}
 	
 	private void generatePath(Vector2 curPos) {
@@ -99,7 +110,7 @@ public class MazeGenerator {
 	
 	private void generateSpikes() {
 		Vector2 spikePos;
-		for (int i=0; i<((TILES_IN_WIDTH-2) * (TILES_IN_HEIGHT-2) * SPIKE_PROBABILITY); i++) {
+		for (int i=0; i<NO_OF_SPIKES; i++) {
 			spikePos = getRandomTile();
 			set(spikePos, SPIKE);
 		}
@@ -112,13 +123,21 @@ public class MazeGenerator {
 	private void generateKey() {
 		do {
 			keyPos = getRandomTile();
-		} while (keyPos.distance(doorPos) < TILES_IN_WIDTH / 2);
+		} while ((keyPos.distance(doorPos) < TILES_IN_WIDTH / 2) || get(keyPos) != PATH);
 	}
 	
 	private void generateTreasure() {
 		do {
 			treasurePos = getRandomTile();
-		} while (treasurePos.distance(doorPos) < TILES_IN_HEIGHT / 2 || treasurePos.distance(keyPos) < TILES_IN_HEIGHT / 2);
+		} while ((treasurePos.distance(doorPos) < TILES_IN_HEIGHT / 2 || 
+				treasurePos.distance(keyPos) < TILES_IN_HEIGHT / 2) || get(treasurePos)!= PATH);
+	}
+	
+	private void generatePlayer() {
+		do {
+			playerPos = getRandomTile();
+		} while ((playerPos.distance(treasurePos) < TILES_IN_HEIGHT / 2 || 
+				playerPos.distance(keyPos) < TILES_IN_HEIGHT / 2) || get(playerPos) != PATH);
 	}
 	
 	private Vector2 getRandomTile() {
@@ -134,7 +153,7 @@ public class MazeGenerator {
 			for (int y=0; y<TILES_IN_HEIGHT; y++) {
 				switch (maze[x][y]) {
 				case WALL:
-					g.setColor(new Color(0, 0, 0));
+					g.setColor(Color.darkGray);
 					g.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE-2, TILE_SIZE-2);
 					break;
 				case SPIKE:
@@ -158,8 +177,22 @@ public class MazeGenerator {
 		}
 	}
 	
+	public void printMaze() {
+		for (int x=0; x < TILES_IN_WIDTH; x++) {
+			System.out.print("{");
+			for (int y=0; y < TILES_IN_HEIGHT; y++) {
+				System.out.print(maze[x][y] + ", ");
+			}
+			System.out.println("},");
+		}
+	}
+	
 	private boolean isEmpty(Vector2 pos) {
 		return maze[pos.x][pos.y] == EMPTY;
+	}
+	
+	private int get(Vector2 pos) {
+		return maze[pos.x][pos.y];
 	}
 	
 	private void set(Vector2 pos, int val) {

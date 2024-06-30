@@ -1,25 +1,28 @@
 package main;
 
 import java.awt.Graphics;
+import java.awt.event.WindowEvent;
 
+import entities.Player;
 import maze.MazeGenerator;
 
 import static utilz.Constants.GameConsts.*;
+import static utilz.Constants.SizeConsts.*;
 
 public class Game implements Runnable {
 	
-	@SuppressWarnings("unused")
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
 	private Thread gameThread;
 	
+	private Player player;
 	private MazeGenerator mazeGenerator;
 	
 	public Game() {
 		initClasses();
 		
 		gamePanel = new GamePanel(this);
-		gameWindow = new GameWindow(gamePanel);
+		gameWindow = new GameWindow(this, gamePanel);
 		gamePanel.setFocusable(true);
 		gamePanel.requestFocus();
 		
@@ -27,8 +30,9 @@ public class Game implements Runnable {
 	}
 
 	private void initClasses() {
-		mazeGenerator = new MazeGenerator();
-		mazeGenerator.generateMaze();
+		player = new Player(TILE_SIZE-4, TILE_SIZE-4);
+		mazeGenerator = new MazeGenerator(player);
+		player.setMap(mazeGenerator.getMaze());
 	}
 	
 	private void startGameLoop() {
@@ -37,11 +41,20 @@ public class Game implements Runnable {
 	}
 	
 	private void update() {
-		
+		player.update();
 	}
 	
 	public void render(Graphics g) {
 		mazeGenerator.render(g);
+		player.render(g);
+	}
+	
+	public void windowFocusLost() {
+		player.stop();
+	}
+	
+	public void closeWindow() {
+		gameWindow.dispatchEvent(new WindowEvent(gameWindow, WindowEvent.WINDOW_CLOSING));
 	}
 
 	@Override
@@ -87,6 +100,10 @@ public class Game implements Runnable {
 
 			}
 		}
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 
 }
