@@ -2,9 +2,10 @@ package maze;
 
 import static utilz.Constants.SizeConsts.*;
 import static utilz.Constants.MapConsts.*;
+import static utilz.LoadImage.GetSprite;
 
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import entities.Player;
@@ -19,6 +20,17 @@ public class MazeGenerator {
 	private Vector2 keyPos;
 	private Vector2 treasurePos;
 	private Vector2 playerPos;
+	
+	private BufferedImage wallImg1;
+	private BufferedImage wallImg2;
+	private BufferedImage pathImg;
+	private BufferedImage spikeImg;
+	private BufferedImage doorImg;
+	private BufferedImage keyImg;
+	private BufferedImage shadowImg;
+	private BufferedImage chestImg;
+	private BufferedImage chestOpenImg;
+	private BufferedImage coinImg;
 	
 	private Player player;
 	
@@ -38,6 +50,17 @@ public class MazeGenerator {
 		}
 		
 		generateMaze();
+		
+		wallImg1 = GetSprite("Tile1");
+		wallImg2 = GetSprite("Tile2");
+		pathImg = GetSprite("Tile3");
+		spikeImg = GetSprite("Obstacle");
+		doorImg = GetSprite("Door");
+		keyImg = GetSprite("Key");
+		shadowImg = GetSprite("Shadow");
+		chestImg = GetSprite("Chest");
+		chestOpenImg = GetSprite("Chest_Open");
+		coinImg = GetSprite("Coin");
 	}
 	
 	public void generateMaze() {
@@ -59,6 +82,7 @@ public class MazeGenerator {
 		generateSpikes();
 		generateKey();
 		generateTreasure();
+		generateCoins();
 		generatePlayer();
 		
 		set(doorPos, DOOR);
@@ -122,26 +146,63 @@ public class MazeGenerator {
 	
 	private void generateKey() {
 		do {
-			keyPos = getRandomTile();
-		} while ((keyPos.distance(doorPos) < TILES_IN_WIDTH / 2) || get(keyPos) != PATH);
+			keyPos = getRandomTileOnPath();
+		} while (keyPos.distance(doorPos) < TILES_IN_WIDTH / 2);
 	}
 	
 	private void generateTreasure() {
 		do {
-			treasurePos = getRandomTile();
+			treasurePos = getRandomTileOnPath();
 		} while ((treasurePos.distance(doorPos) < TILES_IN_HEIGHT / 2 || 
-				treasurePos.distance(keyPos) < TILES_IN_HEIGHT / 2) || get(treasurePos)!= PATH);
+				treasurePos.distance(keyPos) < TILES_IN_HEIGHT / 2));
 	}
 	
 	private void generatePlayer() {
 		do {
-			playerPos = getRandomTile();
+			playerPos = getRandomTileOnPath();
 		} while ((playerPos.distance(treasurePos) < TILES_IN_HEIGHT / 2 || 
-				playerPos.distance(keyPos) < TILES_IN_HEIGHT / 2) || get(playerPos) != PATH);
+				playerPos.distance(keyPos) < TILES_IN_HEIGHT / 2));
+	}
+	
+	private void generateCoins() {
+		Vector2 coinPos = getRandomTileOnPath();
+		int coinsInGrp = 0;
+		
+		for (int i=0; i<NO_OF_COINS; i++) {			
+			if ((coinsInGrp >= 3+random.nextInt(3)) ) {
+				coinPos = getRandomTileOnPath();
+				coinsInGrp = 0;
+			}
+			
+			set(coinPos, COIN);
+			coinsInGrp++;
+			
+			if (maze[coinPos.x][coinPos.y-1] == PATH) {        // Up
+				coinPos = new Vector2(coinPos.x, coinPos.y-1);
+			} else if (maze[coinPos.x-1][coinPos.y] == PATH) { // Left
+				coinPos = new Vector2(coinPos.x-1, coinPos.y);
+			} else if (maze[coinPos.x][coinPos.y+1] == PATH) { // Down
+				coinPos = new Vector2(coinPos.x, coinPos.y+1);
+			} else if (maze[coinPos.x+1][coinPos.y] == PATH) { // Right
+				coinPos = new Vector2(coinPos.x+1, coinPos.y);
+			} else {
+				// If no adjacent PATH found, start a new group
+				coinPos = getRandomTileOnPath();
+				coinsInGrp = 0;
+			}
+		}
 	}
 	
 	private Vector2 getRandomTile() {
 		return new Vector2(oddRow[random.nextInt(oddRow.length)], oddCol[random.nextInt(oddCol.length)]);
+	}
+	
+	private Vector2 getRandomTileOnPath() {
+		Vector2 randomPos;
+		do {
+			randomPos = getRandomTile();
+		} while (get(randomPos) != PATH);
+		return randomPos;
 	}
 	
 	public int[][] getMaze() {
@@ -153,24 +214,41 @@ public class MazeGenerator {
 			for (int y=0; y<TILES_IN_HEIGHT; y++) {
 				switch (maze[x][y]) {
 				case WALL:
-					g.setColor(Color.darkGray);
-					g.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE-2, TILE_SIZE-2);
+					if (y == TILES_IN_HEIGHT-1 || maze[x][y+1] != WALL) {
+						g.drawImage(wallImg2, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					} else {
+						g.drawImage(wallImg1, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					}
 					break;
 				case SPIKE:
-					g.setColor(new Color(255, 0, 0));
-					g.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE-2, TILE_SIZE-2);
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					g.drawImage(spikeImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case PATH:
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
 					break;
 				case DOOR:
-					g.setColor(new Color(150, 75, 0));
-					g.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE-2, TILE_SIZE-2);
+					g.drawImage(doorImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
 					break;
 				case KEY:
-					g.setColor(new Color(255, 215, 0));
-					g.fillRect(x*TILE_SIZE, y*TILE_SIZE + TILE_SIZE/2, TILE_SIZE-2, TILE_SIZE/4);
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					if (!player.isKeyCollected) {
+						g.drawImage(shadowImg, x*TILE_SIZE, (int) (y*TILE_SIZE + TILE_SIZE/2.5), TILE_SIZE, TILE_SIZE, null);
+						g.drawImage(keyImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					}
 					break;
 				case TREASURE:
-					g.setColor(new Color(255, 215, 0));
-					g.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE-2, TILE_SIZE-2);
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					if (player.isChestOpened) {
+						g.drawImage(chestOpenImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					} else {
+						g.drawImage(chestImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					}
+					break;
+				case COIN:
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+					g.drawImage(shadowImg, (int)(x*TILE_SIZE + TILE_SIZE*0.188), (int) (y*TILE_SIZE + TILE_SIZE/2.8), (int)(TILE_SIZE/1.5), TILE_SIZE, null);
+					g.drawImage(coinImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
 					break;
 				}
 			}
@@ -178,13 +256,14 @@ public class MazeGenerator {
 	}
 	
 	public void printMaze() {
-		for (int x=0; x < TILES_IN_WIDTH; x++) {
+		for (int y=0; y < TILES_IN_HEIGHT; y++) {
 			System.out.print("{");
-			for (int y=0; y < TILES_IN_HEIGHT; y++) {
+			for (int x=0; x < TILES_IN_WIDTH; x++) {
 				System.out.print(maze[x][y] + ", ");
 			}
 			System.out.println("},");
 		}
+		System.out.println("[Note: Maze is stored as the transpose of the above matrix.]");
 	}
 	
 	private boolean isEmpty(Vector2 pos) {

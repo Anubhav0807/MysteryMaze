@@ -3,11 +3,13 @@ package main;
 import java.awt.Graphics;
 import java.awt.event.WindowEvent;
 
-import entities.Player;
-import maze.MazeGenerator;
+import javax.swing.JPanel;
+
+import gamestates.GameState;
+import gamestates.MazeState;
+import gamestates.MenuState;
 
 import static utilz.Constants.GameConsts.*;
-import static utilz.Constants.SizeConsts.*;
 
 public class Game implements Runnable {
 	
@@ -15,24 +17,22 @@ public class Game implements Runnable {
 	private GamePanel gamePanel;
 	private Thread gameThread;
 	
-	private Player player;
-	private MazeGenerator mazeGenerator;
+	private MenuState menuState;
+	private MazeState mazeState;
 	
 	public Game() {
-		initClasses();
-		
 		gamePanel = new GamePanel(this);
-		gameWindow = new GameWindow(this, gamePanel);
 		gamePanel.setFocusable(true);
 		gamePanel.requestFocus();
 		
+		initClasses();
+		gameWindow = new GameWindow(this, gamePanel);	
 		startGameLoop();
 	}
 
 	private void initClasses() {
-		player = new Player(TILE_SIZE-4, TILE_SIZE-4);
-		mazeGenerator = new MazeGenerator(player);
-		player.setMap(mazeGenerator.getMaze());
+		menuState = new MenuState(this);
+		mazeState = new MazeState(this);
 	}
 	
 	private void startGameLoop() {
@@ -41,16 +41,48 @@ public class Game implements Runnable {
 	}
 	
 	private void update() {
-		player.update();
+		switch (GameState.state) {
+		case MENU:
+			menuState.update();
+			break;
+		case MAZE:
+			mazeState.update();
+			break;
+		}
 	}
 	
 	public void render(Graphics g) {
-		mazeGenerator.render(g);
-		player.render(g);
+		switch (GameState.state) {
+		case MENU:
+			menuState.render(g);
+			break;
+		case MAZE:
+			mazeState.render(g);
+			break;
+		}
+	}
+	
+	public JPanel getGamePanel() {
+		return gamePanel;
+	}
+	
+	public MenuState getMenuState() {
+		return menuState;
+	}
+	
+	public MazeState getMazeState() {
+		return mazeState;
 	}
 	
 	public void windowFocusLost() {
-		player.stop();
+		switch (GameState.state) {
+		case MENU:
+			menuState.windowFocusLost();
+			break;
+		case MAZE:
+			mazeState.windowFocusLost();
+			break;
+		}
 	}
 	
 	public void closeWindow() {
@@ -97,13 +129,8 @@ public class Game implements Runnable {
 				System.out.println("FPS: " + frames + " | UPS: " + updates);
 				frames = 0;
 				updates = 0;
-
 			}
 		}
-	}
-	
-	public Player getPlayer() {
-		return player;
 	}
 
 }
