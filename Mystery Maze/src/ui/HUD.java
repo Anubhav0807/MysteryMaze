@@ -26,6 +26,8 @@ public class HUD {
 		this.game = game;
 		this.player = player;
 		font = new Font("Lucida Console", Font.PLAIN, 32);
+		timer = "00:00";
+		score = "Score: 0";
 	}
 	
 	public void initTimer() {

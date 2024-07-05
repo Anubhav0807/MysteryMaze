@@ -6,6 +6,8 @@ import static utilz.Constants.GameConsts.UPS_SET;
 import static utilz.HelpMethods.*;
 import static utilz.LoadImage.GetSprite;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import main.Game;
 
 public class Player extends Entity {
 	
-	private int moveSpeed = (int) (4.0f * SCALE * 60 / UPS_SET);
+	private int moveSpeed = 4;
 	private int[][] map;
 	
 	private Game game;
@@ -23,8 +25,13 @@ public class Player extends Entity {
 	private int spriteIdx = 0;
 	private int animationTick = 0;
 	private int stepTime = 4 * UPS_SET;
-	private int stepTimeBlink = (int) (0.2f * UPS_SET);
+	private float stepTimeBlink = 0.2f * UPS_SET;
 	private float gameOverIn = 1.5f; // Seconds
+	
+	// Door lock message
+	private final String msg = "Door is locked.";
+	private final Font font;
+	private boolean showMsg;
 	
 	public boolean up, left, down, right;
 	public boolean W, A, S, D;
@@ -40,17 +47,14 @@ public class Player extends Entity {
 	public int score = 0;
 	
 	public Player(Game game, int width, int height) {
-		this(game, 0, 0, width, height, 0, 0);
+		this(game, 0, 0, width, height);
 	}
 	
 	public Player(Game game, int x, int y, int width, int height) {
-		this(game, x, y, width, height, 0, 0);
-	}
-	
-	public Player(Game game, int x, int y, int width, int height, int offsetX, int offsetY) {
-		super(x, y, width, height, offsetX, offsetY);
+		super(x, y, width, height);
 		this.game = game;
-		this.bombs = new ArrayList<>();
+		this.bombs = new ArrayList<Bomb>();
+		font = new Font("Dialog", Font.PLAIN, (int) (12 * SCALE));
 		sprites = new BufferedImage[] {
 				GetSprite("MainCharacter"), 
 				GetSprite("MainCharacter_Blink"), 
@@ -61,6 +65,7 @@ public class Player extends Entity {
 	public void update() {
 		if (isAlive && isVisible) {
 			int dx = 0, dy = 0;
+			
 			if (up    || W) dy -= moveSpeed;
 			if (left  || A) dx -= moveSpeed;
 			if (down  || S) dy += moveSpeed;
@@ -77,11 +82,20 @@ public class Player extends Entity {
 			
 			updateAnimationTick();
 			checkCollision();
-		} else if (isAlive) {
+			super.update();
+			
+		} else {
+			if (isAlive) {
+				game.getMazeState().levelCleared = true;
+			}
+			else {
+				spriteIdx = 2;
+				game.getMazeState().levelCleared = false;
+			}
 			gameOverIn -= 1.0f/UPS_SET;
 			if (gameOverIn <= 0.0f) {
 				game.getMazeState().gameNotOver = false;
-	        	game.getMazeState().getEndScreenOverlay().setVisible(true);
+	        	if (!isAlive) game.getMazeState().getEndScreenOverlay().setVisible(true);
 			}
 		}
 	}
@@ -103,8 +117,7 @@ public class Player extends Entity {
 	
 	public void checkCollision() {
 		// Checks for collison with enemy and objects (not walls)
-		int xIdx = Math.round((float)x / TILE_SIZE);
-		int yIdx = Math.round((float)y / TILE_SIZE);
+		showMsg = false;
 		
 		switch (map[xIdx][yIdx]) {
 		case TREASURE:
@@ -121,6 +134,7 @@ public class Player extends Entity {
 			break;
 		case DOOR:
 			if (isKeyCollected) isVisible = false;
+			else showMsg = true;
 			break;
 		}
 	}
@@ -130,12 +144,18 @@ public class Player extends Entity {
 		for (Bomb bomb: bombs) {
 			bomb.render(g);
 		}
+		if (showMsg) {
+			g.setFont(font);
+			int msgWidth = g.getFontMetrics().stringWidth(msg);
+			g.setColor(Color.gray);
+			g.fillRect(x + width/2 - msgWidth/2, (int) (y - 15*SCALE), msgWidth, (int) (12 * SCALE));
+			g.setColor(Color.white);
+			g.drawString(msg, x + width/2 - msgWidth/2, (int) (y - 5*SCALE));
+		}
 	}
 	
 	public void dropBomb() {
 		if (canDrop) {
-			int xIdx = Math.round((float)x / TILE_SIZE);
-			int yIdx = Math.round((float)y / TILE_SIZE);
 			bombs.add(new Bomb(xIdx * TILE_SIZE + 2, yIdx * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4));
 			canDrop = false;
 		}
@@ -152,12 +172,15 @@ public class Player extends Entity {
 	
 	public void reset() {
 		stop();
+		bombs.clear();
 		canDrop = true;
 		isAlive = true;
 		isVisible = true;
 		isKeyCollected = false;
 		isChestOpened = false;
 		coinsCollected = 0;
+		spriteIdx = 0;
+		gameOverIn = 1.5f;
 	}
 	
 	private void autoAlign(int dx, int dy) {
@@ -219,10 +242,6 @@ public class Player extends Entity {
 	            dy = 0; // Stop vertical movement if blocked
 	        }
 	    }
-		
-		// Move the hitbox
-		hitbox.x = x;
-		hitbox.y = y;
 	}
 
 }

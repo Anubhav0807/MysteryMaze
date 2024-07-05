@@ -4,7 +4,7 @@ public class Constants {
 	
 	public static class GameConsts {
 		public static final int FPS_SET = 90; // Minimum: 10 FPS
-		public static final int UPS_SET = 90; // Minimum: 30 UPS
+		public static final int UPS_SET = 50; // Minimum: 30 UPS
 	}
 	
 	public static class SizeConsts {
@@ -31,6 +31,7 @@ public class Constants {
 		
 		public static final int NO_OF_SPIKES = 6;
 		public static final int NO_OF_COINS = 30;
+		public static final int NO_OF_ENEMIES = 5;
 	}
 
 }

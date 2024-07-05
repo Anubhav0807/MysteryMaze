@@ -25,6 +25,7 @@ public class MazeState extends State implements StateMethods {
 	private EndScreenOverlay endScreen;
 	
 	public boolean gameNotOver = true;
+	public boolean levelCleared = false;
 
 	@Override
 	public void initClasses() {
@@ -37,16 +38,22 @@ public class MazeState extends State implements StateMethods {
 
 	@Override
 	public void update() {
+		mazeGenerator.update();
 		if (gameNotOver) {
 			player.update();
 			hud.update();
+		} else if (levelCleared) {
+			mazeGenerator.generateMaze();
+			gameNotOver = true;
+			player.reset();
+			hud.initTimer();
 		}
 	}
 
 	@Override
 	public void render(Graphics g) {
 		mazeGenerator.render(g);
-		if (gameNotOver) {
+		if (gameNotOver || levelCleared) {
 			player.render(g);
 			hud.render(g);
 		} else {

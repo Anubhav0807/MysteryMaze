@@ -18,15 +18,11 @@ public class Bomb extends Entity {
 	private int stepTime = (int) (0.2f * UPS_SET);
 	
 	public Bomb(int width, int height) {
-		this(0, 0, width, height, 0, 0);
-	}
-	
-	public Bomb(int x, int y, int width, int height) {
-		this(x, y, width, height, 0, 0);
+		this(0, 0, width, height);
 	}
 
-	public Bomb(int x, int y, int width, int height, int offsetX, int offsetY) {
-		super(x, y, width, height, offsetX, offsetY);
+	public Bomb(int x, int y, int width, int height) {
+		super(x, y, width, height);
 		igniteTime = System.currentTimeMillis();
 		bombImg = GetSprite("Bomb");
 		sparkImg = GetSprite("Bomb_Spark");
@@ -39,6 +35,7 @@ public class Bomb extends Entity {
 				blast();
 			}
 			updateAnimationTick();
+			super.update();
 		}
 	}
 	

@@ -6,8 +6,10 @@ import static utilz.LoadImage.GetSprite;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 
+import entities.Enemy;
 import entities.Player;
 
 public class MazeGenerator {
@@ -33,9 +35,11 @@ public class MazeGenerator {
 	private BufferedImage coinImg;
 	
 	private Player player;
+	private ArrayList<Enemy> enemies;
 	
 	public MazeGenerator(Player player) {
 		this.player = player;
+		enemies = new ArrayList<Enemy>();
 		
 		maze = new int[TILES_IN_WIDTH][TILES_IN_HEIGHT];
 		oddRow = new int[TILES_IN_WIDTH  / 2];
@@ -77,18 +81,21 @@ public class MazeGenerator {
 			}
 		}
 		
+		// THE ORDER MATTERS!!!
 		generateDoor(); // Door acts as the starting point of path generation
 		generatePath(doorPos);
 		generateSpikes();
 		generateKey();
 		generateTreasure();
-		generateCoins();
-		generatePlayer();
 		
 		set(doorPos, DOOR);
 		set(keyPos, KEY);
 		set(treasurePos, TREASURE);
-		player.setPosition(playerPos.x * TILE_SIZE, playerPos.y * TILE_SIZE);
+		
+		generateCoins();
+		spawnPlayer();
+		spawnEnemies();
+		player.setPosition(playerPos.x * TILE_SIZE + 2, playerPos.y * TILE_SIZE + 2);
 	}
 	
 	private void generatePath(Vector2 curPos) {
@@ -97,10 +104,10 @@ public class MazeGenerator {
 		}
 		set(curPos, PATH);
 		
-		Vector2 up    = new Vector2(curPos.x, curPos.y+2);
-		Vector2 left  = new Vector2(curPos.x-2, curPos.y);
-		Vector2 down  = new Vector2(curPos.x, curPos.y-2);
-		Vector2 right = new Vector2(curPos.x+2, curPos.y);		
+		final Vector2 up    = new Vector2(curPos.x, curPos.y+2);
+		final Vector2 left  = new Vector2(curPos.x-2, curPos.y);
+		final Vector2 down  = new Vector2(curPos.x, curPos.y-2);
+		final Vector2 right = new Vector2(curPos.x+2, curPos.y);		
 		
 		final Vector2[] arr = new Vector2[4];
 		int options;
@@ -135,7 +142,7 @@ public class MazeGenerator {
 	private void generateSpikes() {
 		Vector2 spikePos;
 		for (int i=0; i<NO_OF_SPIKES; i++) {
-			spikePos = getRandomTile();
+			spikePos = getRandomTileOnPath();
 			set(spikePos, SPIKE);
 		}
 	}
@@ -157,11 +164,22 @@ public class MazeGenerator {
 				treasurePos.distance(keyPos) < TILES_IN_HEIGHT / 2));
 	}
 	
-	private void generatePlayer() {
+	private void spawnPlayer() {
 		do {
 			playerPos = getRandomTileOnPath();
 		} while ((playerPos.distance(treasurePos) < TILES_IN_HEIGHT / 2 || 
 				playerPos.distance(keyPos) < TILES_IN_HEIGHT / 2));
+	}
+	
+	private void spawnEnemies() {
+		Vector2 enemyPos;
+		enemies.clear(); // In case of restart
+		for (int i=0; i<NO_OF_ENEMIES; i++) {
+			do {
+				enemyPos = getRandomTileOnPath();
+			} while (enemyPos.distance(playerPos) < 5);
+			enemies.add(new Enemy(enemyPos.x*TILE_SIZE+2, enemyPos.y*TILE_SIZE+2, TILE_SIZE-4, TILE_SIZE-4, this));
+		}
 	}
 	
 	private void generateCoins() {
@@ -209,6 +227,20 @@ public class MazeGenerator {
 		return maze;
 	}
 	
+	public Player gePlayer() {
+		return player;
+	}
+	
+	public ArrayList<Enemy> getEnemies() {
+		return enemies;
+	}
+	
+	public void update() {
+		for (Enemy enemy: enemies) {
+			enemy.update();
+		}
+	}
+	
 	public void render(Graphics g) {
 		for (int x=0; x<TILES_IN_WIDTH; x++) {
 			for (int y=0; y<TILES_IN_HEIGHT; y++) {
@@ -253,6 +285,10 @@ public class MazeGenerator {
 				}
 			}
 		}
+		
+		for (Enemy enemy: enemies) {
+			enemy.render(g);
+		}
 	}
 	
 	public void printMaze() {
@@ -268,6 +304,10 @@ public class MazeGenerator {
 	
 	private boolean isEmpty(Vector2 pos) {
 		return maze[pos.x][pos.y] == EMPTY;
+	}
+	
+	public boolean isPath(Vector2 pos) {
+		return get(pos) != WALL && get(pos) != SPIKE;
 	}
 	
 	private int get(Vector2 pos) {
