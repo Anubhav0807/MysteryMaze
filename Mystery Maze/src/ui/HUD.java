@@ -58,7 +58,7 @@ public class HUD {
 		g.setFont(font);
 		g.drawString(bombCount, TILE_SIZE*5/2, (int) (GAME_HEIGHT - 18 * SCALE));
 		g.drawString(timer, GAME_WIDTH/2 - g.getFontMetrics().stringWidth(timer)/2, (int) (GAME_HEIGHT - 18 * SCALE));
-		g.drawString(score, GAME_WIDTH - g.getFontMetrics().stringWidth(score)*7/4, (int) (GAME_HEIGHT - 18 * SCALE));
+		g.drawString(score, GAME_WIDTH - g.getFontMetrics().stringWidth("Score: 0")*7/4, (int) (GAME_HEIGHT - 18 * SCALE));
 	}
 	
 	public String getTimer() {

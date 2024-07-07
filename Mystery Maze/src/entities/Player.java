@@ -124,6 +124,7 @@ public class Player extends Entity {
 		case TREASURE:
 			if (!isChestOpened) {
 				isChestOpened = true;
+				score += 100;
 			}
 			break;
 		case KEY:
@@ -132,6 +133,7 @@ public class Player extends Entity {
 		case COIN:
 			map[xIdx][yIdx] = PATH;
 			coinsCollected++;
+			score += 10;
 			break;
 		case DOOR:
 			if (isKeyCollected) isVisible = false;
