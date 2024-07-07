@@ -43,6 +43,7 @@ public class Player extends Entity {
 	public boolean isChestOpened = false;
 	public boolean isKeyCollected = false;
 	
+	public int bombsLeft = 10;
 	public int coinsCollected = 0;
 	public int score = 0;
 	
@@ -155,9 +156,10 @@ public class Player extends Entity {
 	}
 	
 	public void dropBomb() {
-		if (canDrop) {
+		if (canDrop && bombsLeft > 0) {
 			bombs.add(new Bomb(xIdx * TILE_SIZE + 2, yIdx * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4));
 			canDrop = false;
+			bombsLeft--;
 		}
 	}
 	
@@ -179,6 +181,7 @@ public class Player extends Entity {
 		isKeyCollected = false;
 		isChestOpened = false;
 		coinsCollected = 0;
+		bombsLeft = 10;
 		spriteIdx = 0;
 		gameOverIn = 1.5f;
 	}
