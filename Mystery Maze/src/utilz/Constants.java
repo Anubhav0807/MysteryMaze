@@ -35,5 +35,16 @@ public class Constants {
 		
 		public static final int BOMB_RANGE = 2; // tiles
 	}
+	
+	public static class AudioConsts {
+		public static final String BG_MUSIC = "/audio/V01_Continue.wav";
+		public static final String INTRO_MUSIC = "/audio/V01_Peaceful_Place.wav";
+		public static final String EXPLOSION_SOUND = "/audio/V01_Explosion.wav";
+		public static final String GAME_OVER_SOUND = "/audio/V01_Game_Over.wav";
+		public static final String COIN_SOUND = "/audio/V01_Coin.wav";
+		public static final String VALUABLE_SOUND = "/audio/V01_Valuable.wav";
+		public static final String DOOR_OPEN_SOUND = "/audio/V01_Door_Open.wav";
+		public static final String DIE_SOUND = "/audio/V01_Die.wav";
+	}
 
 }

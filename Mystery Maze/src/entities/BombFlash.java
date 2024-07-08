@@ -12,10 +12,10 @@ import static utilz.Constants.MapConsts.*;
 
 public class BombFlash extends Entity {
 	
-	private Player player;
-	private ArrayList<Enemy> enemies;
-	private int[][] map;
-	private BufferedImage flashImg;
+	private final Player player;
+	private final ArrayList<Enemy> enemies;
+	private final int[][] map;
+	private final BufferedImage flashImg;
 	
 	private float delayAppearance, delayDisappearance;
 	private float sizePercent = 0.25f;

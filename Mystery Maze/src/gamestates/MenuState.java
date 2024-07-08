@@ -15,6 +15,7 @@ import ui.CustomButton;
 import static utilz.LoadImage.GetSprite;
 import static utilz.Constants.SizeConsts.*;
 import static utilz.Constants.GameConsts.UPS_SET;
+import static utilz.Constants.AudioConsts.*;
 
 public class MenuState extends State implements StateMethods {
 	
@@ -52,6 +53,8 @@ public class MenuState extends State implements StateMethods {
 				game.getGamePanel().remove(playButton);
 				game.getGamePanel().remove(exitButton);
 				game.getGamePanel().requestFocus();
+				game.audioPlayer.stop(INTRO_MUSIC);
+				game.audioPlayer.playOnLoop(BG_MUSIC);
 			}
 		});
 		
@@ -65,6 +68,8 @@ public class MenuState extends State implements StateMethods {
 				game.closeWindow();
 			}
 		});
+		
+		game.audioPlayer.playOnLoop(INTRO_MUSIC);
 	}
 
 	@Override

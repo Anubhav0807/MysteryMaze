@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import gamestates.GameState;
 import gamestates.MazeState;
 import gamestates.MenuState;
+import utilz.AudioPlayer;
 
 import static utilz.Constants.GameConsts.*;
 
@@ -16,6 +17,8 @@ public class Game implements Runnable {
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
 	private Thread gameThread;
+	
+	public AudioPlayer audioPlayer;
 	
 	private MenuState menuState;
 	private MazeState mazeState;
@@ -31,6 +34,7 @@ public class Game implements Runnable {
 	}
 
 	private void initClasses() {
+		audioPlayer = new AudioPlayer();
 		menuState = new MenuState(this);
 		mazeState = new MazeState(this);
 	}

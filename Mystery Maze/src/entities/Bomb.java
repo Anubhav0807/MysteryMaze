@@ -12,6 +12,7 @@ import maze.Vector2;
 
 import static utilz.Constants.MapConsts.*;
 import static utilz.Constants.SizeConsts.TILE_SIZE;
+import static utilz.Constants.AudioConsts.EXPLOSION_SOUND;;
 
 public class Bomb extends Entity {
 	
@@ -19,17 +20,17 @@ public class Bomb extends Entity {
 	private final long timer = 2000; // In milli seconds
 	private boolean blasted = false;
 	private boolean isPlayerOnTop = true;
-	private BufferedImage bombImg;
+	private final BufferedImage bombImg;
 	private BufferedImage sparkImg;
-	private BufferedImage shadowImg;
+	private final BufferedImage shadowImg;
 	private int animationTick = 0;
 	private int stepTime = (int) (0.2f * UPS_SET);
 	
-	private ArrayList<BombFlash> explosion;
-	private ArrayList<Enemy> enemies;
-	private Player player;
-	private Game game;
-	private int[][] map;
+	private final ArrayList<BombFlash> explosion;
+	private final ArrayList<Enemy> enemies;
+	private final Player player;
+	private final Game game;
+	private final int[][] map;
 	
 	public boolean toBeDeleted = false;
 	
@@ -92,8 +93,8 @@ public class Bomb extends Entity {
 	
 	public void render(Graphics g) {
 		if (blasted) {
-			for (BombFlash bombFlash: explosion) {
-				bombFlash.render(g);
+			for (int i=0; i < explosion.size(); i++) {
+				explosion.get(i).render(g);
 			}
 		}
 		else {
@@ -105,6 +106,7 @@ public class Bomb extends Entity {
 	
 	private void blast() {
 		blasted = true;
+		game.audioPlayer.play(EXPLOSION_SOUND);
 		Vector2 up, left, down, right;
 		boolean upBlocked, leftBlocked, downBlocked, rightBlocked;
 		upBlocked = leftBlocked = downBlocked = rightBlocked = false;

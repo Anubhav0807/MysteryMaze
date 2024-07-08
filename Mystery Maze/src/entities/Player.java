@@ -3,6 +3,7 @@ package entities;
 import static utilz.Constants.MapConsts.*;
 import static utilz.Constants.SizeConsts.*;
 import static utilz.Constants.GameConsts.UPS_SET;
+import static utilz.Constants.AudioConsts.*;
 import static utilz.HelpMethods.*;
 import static utilz.LoadImage.GetSprite;
 
@@ -16,12 +17,12 @@ import main.Game;
 
 public class Player extends Entity {
 	
-	private int moveSpeed = 4;
+	private final int moveSpeed = 4;
 	private int[][] map;
 	
-	private Game game;
-	private ArrayList<Bomb> bombs;
-	private BufferedImage[] sprites;
+	private final Game game;
+	private final ArrayList<Bomb> bombs;
+	private final BufferedImage[] sprites;
 	private int spriteIdx = 0;
 	private int animationTick = 0;
 	private int stepTime = 4 * UPS_SET;
@@ -90,9 +91,15 @@ public class Player extends Entity {
 				game.getMazeState().levelCleared = false;
 			}
 			gameOverIn -= 1.0f/UPS_SET;
-			if (gameOverIn <= 0.0f) {
+			if (gameOverIn <= 0.0f && game.getMazeState().gameNotOver) {
 				game.getMazeState().gameNotOver = false;
-	        	if (!isAlive) game.getMazeState().getEndScreenOverlay().setVisible(true);
+				if (!game.getMazeState().levelCleared) {
+					game.audioPlayer.stop(BG_MUSIC);
+					game.audioPlayer.play(GAME_OVER_SOUND);
+				}
+	        	if (!isAlive) {
+	        		game.getMazeState().getEndScreenOverlay().setVisible(true);
+	        	}
 			}
 		}
 		for (int i=0; i < bombs.size(); i++) {
@@ -123,31 +130,40 @@ public class Player extends Entity {
 		switch (map[xIdx][yIdx]) {
 		case TREASURE:
 			if (!isChestOpened) {
+				game.audioPlayer.play(VALUABLE_SOUND);
 				isChestOpened = true;
 				score += 100;
 			}
 			break;
 		case KEY:
+			game.audioPlayer.play(VALUABLE_SOUND);
+			map[xIdx][yIdx] = PATH;
 			isKeyCollected = true;
 			break;
 		case COIN:
+			game.audioPlayer.play(COIN_SOUND);
 			map[xIdx][yIdx] = PATH;
 			coinsCollected++;
 			score += 10;
 			break;
 		case DOOR:
-			if (isKeyCollected) isVisible = false;
-			else showMsg = true;
+			if (isKeyCollected) {
+				game.audioPlayer.play(DOOR_OPEN_SOUND);
+				isVisible = false;
+			} else {
+				showMsg = true;
+			}
 			break;
 		case SPIKE:
+			game.audioPlayer.play(DIE_SOUND);
 			isAlive = false;
 			break;
 		}
 	}
 	
 	public void render(Graphics g) {
-		for (Bomb bomb: bombs) {
-			bomb.render(g);
+		for (int i=0; i < bombs.size(); i++) {
+			bombs.get(i).render(g);
 		}
 		if (isVisible) g.drawImage(sprites[spriteIdx], x, y, width, height, null);
 		if (showMsg) {
@@ -189,6 +205,10 @@ public class Player extends Entity {
 		bombsLeft = 10;
 		spriteIdx = 0;
 		gameOverIn = 1.5f;
+	}
+	
+	public Game getGame() {
+		return game;
 	}
 	
 	private void autoAlign(int dx, int dy) {

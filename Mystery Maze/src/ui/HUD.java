@@ -9,14 +9,15 @@ import entities.Player;
 import main.Game;
 
 import static utilz.Constants.SizeConsts.*;
-import static utilz.LoadImage.GetSprite;
+import static utilz.LoadImage.*;
 
 public class HUD {
 	
-	private Game game;
-	private Player player;
-	private Font font;	
-	private BufferedImage bombImg;
+	private final Game game;
+	private final Player player;
+	private final Font font;	
+	private final BufferedImage bombImg;
+	private final BufferedImage keyImg;
 	
 	private long startTime, currentTime;
 	private int totalTimeInSecs;
@@ -31,6 +32,7 @@ public class HUD {
 		this.player = player;
 		font = new Font("Lucida Console", Font.PLAIN, 32);
 		bombImg = GetSprite("Bomb");
+		keyImg = GetRotatedImage(GetSprite("Key"), 90);
 		bombCount = "x 0";
 		timer = "00:00";
 		score = "Score: 0";
@@ -59,6 +61,11 @@ public class HUD {
 		g.drawString(bombCount, TILE_SIZE*5/2, (int) (GAME_HEIGHT - 18 * SCALE));
 		g.drawString(timer, GAME_WIDTH/2 - g.getFontMetrics().stringWidth(timer)/2, (int) (GAME_HEIGHT - 18 * SCALE));
 		g.drawString(score, GAME_WIDTH - g.getFontMetrics().stringWidth("Score: 0")*7/4, (int) (GAME_HEIGHT - 18 * SCALE));
+		
+		if (player.isKeyCollected && player.isVisible) {
+			g.drawImage(keyImg, TILE_SIZE*13/2, (int) (GAME_HEIGHT-TILE_SIZE*1.35f), TILE_SIZE, TILE_SIZE, null);
+			g.drawString("x 1", TILE_SIZE*8, (int) (GAME_HEIGHT - 18 * SCALE));
+		}
 	}
 	
 	public String getTimer() {

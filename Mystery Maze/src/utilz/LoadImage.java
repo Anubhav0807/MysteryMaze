@@ -12,7 +12,7 @@ public class LoadImage {
 	
 	public static BufferedImage GetSprite(String filename) {
 		BufferedImage img = null;
-		InputStream inputStream = LoadImage.class.getResourceAsStream("/V01_" + filename + ".png");
+		InputStream inputStream = LoadImage.class.getResourceAsStream("/images/V01_" + filename + ".png");
 		try {
 			img = ImageIO.read(inputStream);
 		} catch (IOException e) {

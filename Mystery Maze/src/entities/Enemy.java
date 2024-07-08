@@ -13,6 +13,7 @@ import maze.Vector2;
 import static utilz.Constants.GameConsts.UPS_SET;
 import static utilz.Constants.MapConsts.*;
 import static utilz.Constants.SizeConsts.SCALE;
+import static utilz.Constants.AudioConsts.DIE_SOUND;
 import static utilz.LoadImage.GetSprite;
 import static utilz.HelpMethods.CanMoveHere;
 
@@ -58,7 +59,7 @@ public class Enemy extends Entity {
 		super(x, y, width, height);
 		this.mazeGenerator = mazeGenerator;
 		map = mazeGenerator.getMaze();
-		target = mazeGenerator.gePlayer();
+		target = mazeGenerator.getPlayer();
 		random = new Random();
 		aliveImg = GetSprite("Enemy");
 		deadImg = GetSprite("Enemy_Dead");
@@ -266,8 +267,9 @@ public class Enemy extends Entity {
 	}
 	
 	private void checkCollision() {
-		if (isColliding(target)) {
+		if (target.isAlive && target.isVisible && isColliding(target)) {
 			target.isAlive = false;
+			target.getGame().audioPlayer.play(DIE_SOUND);
 			missonCompletedWithRespectPlusPlus = true;
 		}
 	}

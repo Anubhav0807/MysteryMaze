@@ -227,7 +227,7 @@ public class MazeGenerator {
 		return maze;
 	}
 	
-	public Player gePlayer() {
+	public Player getPlayer() {
 		return player;
 	}
 	
@@ -264,11 +264,9 @@ public class MazeGenerator {
 					g.drawImage(doorImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
 					break;
 				case KEY:
-					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
-					if (!player.isKeyCollected) {
-						g.drawImage(shadowImg, x*TILE_SIZE, (int) (y*TILE_SIZE + TILE_SIZE/2.5), TILE_SIZE, TILE_SIZE, null);
-						g.drawImage(keyImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
-					}
+					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);					
+					g.drawImage(shadowImg, x*TILE_SIZE, (int) (y*TILE_SIZE + TILE_SIZE/2.5), TILE_SIZE, TILE_SIZE, null);
+					g.drawImage(keyImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
 					break;
 				case TREASURE:
 					g.drawImage(pathImg, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
@@ -289,8 +287,8 @@ public class MazeGenerator {
 	}
 	
 	public void renderEnemies(Graphics g) {
-		for (Enemy enemy: enemies) {
-			enemy.render(g);
+		for (int i=0; i < enemies.size(); i++) {
+			enemies.get(i).render(g);
 		}
 	}
 	

@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static utilz.Constants.SizeConsts.*;
+import static utilz.Constants.AudioConsts.*;
 
 public class EndScreenOverlay {
 	
@@ -35,6 +36,7 @@ public class EndScreenOverlay {
 				hud.getGame().getMazeState().gameNotOver = true;
 				hud.getGame().getMazeState().getHud().initTimer();
 				hud.getGame().getMazeState().getPlayer().score = 0;
+				hud.getGame().audioPlayer.playOnLoop(BG_MUSIC);
 				setVisible(false);
 			}
 		});

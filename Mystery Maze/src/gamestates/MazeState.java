@@ -1,7 +1,5 @@
 package gamestates;
 
-import static utilz.Constants.SizeConsts.TILE_SIZE;
-
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -11,6 +9,8 @@ import main.Game;
 import maze.MazeGenerator;
 import ui.EndScreenOverlay;
 import ui.HUD;
+
+import static utilz.Constants.SizeConsts.TILE_SIZE;
 
 public class MazeState extends State implements StateMethods {
 	
