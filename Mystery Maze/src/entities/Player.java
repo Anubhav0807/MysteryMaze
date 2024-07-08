@@ -77,10 +77,6 @@ public class Player extends Entity {
 				move(dx, dy);
 			}
 			
-			for (Bomb bomb: bombs) {
-				bomb.update();
-			}
-			
 			updateAnimationTick();
 			checkCollision();
 			super.update();
@@ -98,6 +94,10 @@ public class Player extends Entity {
 				game.getMazeState().gameNotOver = false;
 	        	if (!isAlive) game.getMazeState().getEndScreenOverlay().setVisible(true);
 			}
+		}
+		for (int i=0; i < bombs.size(); i++) {
+			bombs.get(i).update();
+			if (bombs.get(i).toBeDeleted) bombs.remove(i);
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class Player extends Entity {
 	}
 	
 	public void checkCollision() {
-		// Checks for collison with enemy and objects (not walls)
+		// Checks for collison with objects
 		showMsg = false;
 		
 		switch (map[xIdx][yIdx]) {
@@ -139,14 +139,17 @@ public class Player extends Entity {
 			if (isKeyCollected) isVisible = false;
 			else showMsg = true;
 			break;
+		case SPIKE:
+			isAlive = false;
+			break;
 		}
 	}
 	
 	public void render(Graphics g) {
-		if (isVisible) g.drawImage(sprites[spriteIdx], x, y, width, height, null);
 		for (Bomb bomb: bombs) {
 			bomb.render(g);
 		}
+		if (isVisible) g.drawImage(sprites[spriteIdx], x, y, width, height, null);
 		if (showMsg) {
 			g.setFont(font);
 			int msgWidth = g.getFontMetrics().stringWidth(msg);
@@ -158,8 +161,8 @@ public class Player extends Entity {
 	}
 	
 	public void dropBomb() {
-		if (canDrop && bombsLeft > 0) {
-			bombs.add(new Bomb(xIdx * TILE_SIZE + 2, yIdx * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4));
+		if (canDrop && bombsLeft > 0 && isAlive && isVisible) {
+			bombs.add(new Bomb(xIdx * TILE_SIZE + 2, yIdx * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4, game));
 			canDrop = false;
 			bombsLeft--;
 		}

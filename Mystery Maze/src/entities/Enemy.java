@@ -3,7 +3,6 @@ package entities;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
@@ -43,7 +42,10 @@ public class Enemy extends Entity {
 	private Color msgColor;
 	private float confuseDuration = 0.0f;
 	
-	private boolean isAlive = true;
+	public boolean isAlive = true;
+	public boolean toBeDeleted = false;
+	private float toBeDeletedIn = 1.0f; // Seconds
+	
 	private boolean isChasing = false;
 	private boolean missonCompletedWithRespectPlusPlus = false;
 	private Direction direction;
@@ -99,6 +101,9 @@ public class Enemy extends Entity {
 			}
 			checkCollision();
 			updateMsg();
+		} else if (!toBeDeleted) {
+			toBeDeletedIn -= 1.0f/UPS_SET;
+			if (toBeDeletedIn <= 0) toBeDeleted = true;
 		}
 	}
 	
@@ -261,9 +266,7 @@ public class Enemy extends Entity {
 	}
 	
 	private void checkCollision() {
-		Rectangle hitbox = new Rectangle(x, y, width, height);
-		Rectangle targetHitbox = new Rectangle(target.x, target.y, target.width, target.height);
-		if (hitbox.intersects(targetHitbox)) {
+		if (isColliding(target)) {
 			target.isAlive = false;
 			missonCompletedWithRespectPlusPlus = true;
 		}

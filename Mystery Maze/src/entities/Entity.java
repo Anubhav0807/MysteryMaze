@@ -2,6 +2,8 @@ package entities;
 
 import static utilz.Constants.SizeConsts.TILE_SIZE;
 
+import java.awt.Rectangle;
+
 public abstract class Entity {
 
 	protected int x, y;
@@ -33,6 +35,12 @@ public abstract class Entity {
 	
 	public boolean onSingleTile() {
 		return (xIdx * TILE_SIZE <= x && yIdx * TILE_SIZE <= y && (x+width) < (xIdx+1) * TILE_SIZE && (y+height) < (yIdx+1) * TILE_SIZE);
+	}
+	
+	public boolean isColliding(Entity other) {
+		Rectangle hitbox = new Rectangle(x, y, width, height);
+		Rectangle otherHitbox = new Rectangle(other.x, other.y, other.width, other.height);
+		return hitbox.intersects(otherHitbox);
 	}
 	
 	private void updateIndex() {

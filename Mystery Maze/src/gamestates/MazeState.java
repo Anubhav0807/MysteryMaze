@@ -39,8 +39,8 @@ public class MazeState extends State implements StateMethods {
 	@Override
 	public void update() {
 		mazeGenerator.update();
+		player.update();
 		if (gameNotOver) {
-			player.update();
 			hud.update();
 		} else if (levelCleared) {
 			mazeGenerator.generateMaze();
@@ -53,8 +53,9 @@ public class MazeState extends State implements StateMethods {
 	@Override
 	public void render(Graphics g) {
 		mazeGenerator.render(g);
+		player.render(g);
+		mazeGenerator.renderEnemies(g);
 		if (gameNotOver || levelCleared) {
-			player.render(g);
 			hud.render(g);
 		} else {
 			endScreen.render(g);

@@ -236,8 +236,9 @@ public class MazeGenerator {
 	}
 	
 	public void update() {
-		for (Enemy enemy: enemies) {
-			enemy.update();
+		for (int i=0; i < enemies.size(); i++) {
+			enemies.get(i).update();
+			if (enemies.get(i).toBeDeleted) enemies.remove(i);
 		}
 	}
 	
@@ -284,8 +285,10 @@ public class MazeGenerator {
 					break;
 				}
 			}
-		}
-		
+		}		
+	}
+	
+	public void renderEnemies(Graphics g) {
 		for (Enemy enemy: enemies) {
 			enemy.render(g);
 		}

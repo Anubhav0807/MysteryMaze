@@ -32,6 +32,8 @@ public class Constants {
 		public static final int NO_OF_SPIKES = 6;
 		public static final int NO_OF_COINS = 30;
 		public static final int NO_OF_ENEMIES = 5;
+		
+		public static final int BOMB_RANGE = 2; // tiles
 	}
 
 }
