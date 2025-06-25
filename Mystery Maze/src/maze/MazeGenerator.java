@@ -94,8 +94,8 @@ public class MazeGenerator {
 		
 		generateCoins();
 		spawnPlayer();
-		spawnEnemies();
 		player.setPosition(playerPos.x * TILE_SIZE + 2, playerPos.y * TILE_SIZE + 2);
+		spawnEnemies();
 	}
 	
 	private void generatePath(Vector2 curPos) {
